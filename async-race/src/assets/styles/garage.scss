@@ -1,0 +1,215 @@
+
+@mixin btn($color){
+  height: 30px;
+  width: 120px;
+  font-size: 1.2rem;
+  border-radius: 5%;
+  background-color: $color;
+  box-shadow: rgba(251, 249, 249, 0.831) 0px -3px 0px inset;
+}
+
+@mixin blue-btn{
+  @include btn(rgb(31, 146, 234));
+  &:hover{
+    background-color: rgb(23, 82, 220);
+  }
+}
+
+@mixin yellow-btn {
+  @include btn(rgb(234, 217, 31));
+  &:hover{
+    background-color: rgb(236, 163, 39);
+  }
+}
+
+
+body {
+  background-color: rgb(9, 9, 9);
+}
+.main-content {
+  font-family: 'Roboto', sans-serif;
+  background-color: rgb(9, 9, 9);
+  padding: 20px;
+}
+
+.header__btns {
+}
+
+.btn-garage {
+  @include yellow-btn();
+}
+
+.btn-winners {
+  @include blue-btn();
+}
+
+.control__btn {
+  @include blue-btn();
+  width: 100px;
+  height: 25px;
+}
+
+.cars-control {
+  margin: 50px 0 70px;
+  width: 400px;
+}
+
+.cars-control__create,
+.cars-control__update {
+  display: flex;
+  column-gap: 10px;
+  margin-bottom: 20px;
+}
+
+.input-name {
+  width: 55%;
+  height: 30px;
+  border-radius: 5px;
+  background-color: rgb(235, 239, 242);
+  padding: 10px;
+  font-size: 1.5rem;
+  color: #000;
+    &:focus { 
+      border: 3px ridge  rgb(43, 187, 239)
+    }
+}
+
+.input-color {
+  border-radius: 5px;
+}
+
+.cars-control__update {
+}
+.cars-control__race {
+}
+
+.race__btn {
+  @include yellow-btn();
+}
+
+.generate__btn {
+  @include blue-btn();
+  width: 145px;
+}
+
+.cars-garage {
+}
+.cars-garage__title {
+  font-size: 2.5rem;
+  color: #fff;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+.cars-garage__amount {
+}
+.cars-garage__subtitle {
+  font-size: 2rem;
+  color: #fff;
+  font-weight: 500;
+  margin-bottom: 20px;
+}
+
+.cars-garage__page {
+}
+
+.cars-garage__car {
+  margin-bottom: 35px;
+}
+
+.car__ammend {
+}
+.ammend-btn {
+  @include blue-btn();
+  width: 80px;
+  height: 20px;
+  font-size: 1rem;;
+}
+
+.car__name {
+  font-size: 1.5rem;
+  color: rgb(234, 217, 31);
+  font-weight: 600;
+  margin-left: 15px;
+
+}
+.car__control {
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  &::after{
+    content: '';
+    width: 100%;
+    position: absolute;
+    color: #fff;
+    border-bottom: 4px dashed #fff;
+    top: 70px;
+  }
+}
+
+.car-item{
+  display: flex;
+  width: 100%;
+}
+
+.car-control__btns{
+  margin: 10px;
+}
+.control-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 5px;
+  font-weight: 700;
+  background-color: #000;
+}
+.btn-start {
+  color: rgb(55, 235, 127);
+  border: 2px solid rgb(55, 235, 127);
+  &:hover {
+    background-color: rgb(50, 115, 76);
+  }
+
+}
+.btn-return {
+  color: rgb(226, 73, 73);
+  border: 2px solid rgb(226, 73, 73);
+  &:hover {
+    background-color: rgb(119, 41, 41);
+  }
+
+}
+.car-svg {
+  background-image: url('./car.svg');
+  background-repeat: no-repeat;
+  background-size: cover;
+  margin-top: 20px;
+  height: 50px;
+  width: 100px;
+}
+
+.flag-svg {
+  height: 55px;
+  background-image: url('./race-flag.svg');
+  background-repeat: no-repeat;
+  background-size: contain;
+  flex: 0 1 25%;
+  width: 100px;
+}
+.pagination-btns {
+  margin: 50px 0;
+}
+
+.pagination-btn {
+  @include btn(rgb(169, 169, 169));
+  width: 70px;
+  height: 23px;
+  font-size: 1rem;
+  &:hover{
+    background-color: rgb(85, 84, 84);
+  }
+}
+.pagination-btn__prev {
+}
+.pagination-btn__next {
+}
