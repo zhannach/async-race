@@ -44,6 +44,7 @@ export default class Garage {
   async run() {
     await this.render()
     this.renderPagination()
+    this.attach()
   }
 
   async render() {
@@ -122,5 +123,64 @@ export default class Garage {
       <button class="pagination-btn pagination-btn__next">NEXT</button`
   }
 
+  async renderRandomCars() {
+    let count = 100
+    console.log(getCarColor())
+    while( 0 < count) {
+      await this.api.createCar({ name: getCarName(), color: getCarColor()})
+      count--
+    }
+  }
+
+  attach() {
+    const createBtn = document.querySelector('.btn__create') as HTMLButtonElement
+    createBtn.addEventListener('click', () => {
+      this.createEl()
+      this.renderGarageCars()
+    })
+    const updateBtn = document.querySelector('.btn__update') as HTMLButtonElement
+    updateBtn.addEventListener('click', () => {
+      this.updateEl()
+      this.renderGarageCars()
+    })
+    const prevBtnPagination = document.querySelector('.pagination-btn__prev') as HTMLButtonElement
+    prevBtnPagination.addEventListener('click', () => {
+      if (this.pageNumber > 1) this.pageNumber--
+      window.location.hash = `page${this.pageNumber}` 
+      this.renderGarageCars()
+    })
+    const nextBtnPagination = document.querySelector('.pagination-btn__next') as HTMLButtonElement
+    nextBtnPagination.addEventListener('click', () => {
+      if (this.pageNumber < Math.ceil(Number(this.count) / 7)) this.pageNumber++
+      window.location.hash = `page${this.pageNumber}`
+      this.renderGarageCars()
+    })
+    const genereteBtn = document.querySelector('.generate__btn') as HTMLButtonElement
+    genereteBtn.addEventListener('click', async() => {
+      await this.renderRandomCars()
+      await this.renderGarageCars()
+    })
+  }
+
+  async createEl() {
+    const inputName = document.querySelector('.create__name') as HTMLInputElement
+    const inputColor = document.querySelector('.create__color') as HTMLInputElement
+    console.log(inputName)
+    let name = inputName.value as string
+    name = `${name[0].toUpperCase()}${name.slice(1)}`
+    const color = inputColor.value as string
+    if (name) {
+      inputName.classList.remove('empty')
+      return await this.api.createCar({ name, color })
+    } else {
+      inputName.classList.add('empty')
+    }
+  }
+
+  async updateEl() {
+    const name = this.updateName?.value as string
+    const color = this.updateColor?.value as string
+    await this.api.updateCar(this.carItem?.id as number, { name, color })
+  }
 
 } 
