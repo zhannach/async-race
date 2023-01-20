@@ -1,6 +1,6 @@
 import CarApi from "../../carApi"
 import { CarType } from "../type/types"
-import { createEl, getCarColor, getCarName } from '../helpers/functions'
+import { createEl, getCarColor, getCarName, animate, getDistance } from '../helpers/functions'
 import interpolate from '../helpers/interpolate'
 
 
@@ -12,13 +12,14 @@ export default class Garage {
   updateColor: HTMLInputElement | undefined
   header: HTMLElement
   paginationEl: HTMLElement
-  controlContainer:HTMLElement 
+  controlContainer: HTMLElement
   count: string | undefined
   items: CarType[] | undefined
   MAX_CARS_PER_PAGE: number
   pageNumber: number = 1
   carItem: CarType | undefined
   carElem: Element | undefined
+  animationFrames: Record<number, number> = {}
   onUpdate: () => void = () => null
 
 
@@ -35,10 +36,11 @@ export default class Garage {
     this.MAX_CARS_PER_PAGE = 7
     if (window.location.hash.slice(0, 5) === '#page') {
       this.pageNumber = Number(window.location.hash.slice(5))
-    } 
+    }
     this.pageNumber = this.count && Number(this.count) > this.MAX_CARS_PER_PAGE ? this.pageNumber : 1
     this.updateName = undefined
     this.updateColor = undefined
+    this.animationFrames
   }
 
   async run() {
@@ -82,14 +84,14 @@ export default class Garage {
   }
 
   async renderGarageCars() {
-    this.carsGarageEl.innerHTML = ''
+    this.animationFrames = {}
     const { items, count } = await this.api.getCars(this.pageNumber)
-    this.items = items
-    this.count = count  
+    this.count = count
     const template = document.querySelector('#car') as HTMLTemplateElement
     const cars: string[] = items.map((item) => {
       return interpolate(template.innerHTML, { item })
     })
+    this.carsGarageEl.innerHTML = ''
     this.carsGarageEl.innerHTML = `<h2 class="cars-garage__title">GARAGE
       <span class="cars-garage__amount">(${this.count})</span>
     </h2>
@@ -97,10 +99,12 @@ export default class Garage {
       <span class="cars-garage__page">#${this.pageNumber}</span>
     </h3>
     ${cars.join('')}`
+
     this.updateName = document.querySelector('.update__name') as HTMLInputElement
     this.updateColor = document.querySelector('.update__color') as HTMLInputElement
     this.carsGarageEl.querySelectorAll('.cars-garage__car').forEach((item, index) => {
       const car = items[index]
+      const carSvg = item.querySelector('.car-svg') as HTMLElement
       const btnSelect = item.querySelector('.btn-select') as HTMLButtonElement
       btnSelect.addEventListener('click', async () => {
         this.carItem = car;
@@ -115,6 +119,19 @@ export default class Garage {
         await this.api.deleteCar(car.id as number)
         await this.renderGarageCars()
       })
+      const startCarBtn = item.querySelector('.btn-start') as HTMLButtonElement
+      startCarBtn.addEventListener('click', async () => {
+        startCarBtn.classList.add('in-active')
+        startCarBtn.disabled = true
+        returnCarBtn.classList.toggle('in-active')
+        await this.carStart(car.id as number, carSvg)
+      })
+      const returnCarBtn = item.querySelector('.btn-return') as HTMLButtonElement
+      returnCarBtn.addEventListener('click', () => {
+        returnCarBtn.classList.toggle('in-active')
+        startCarBtn.classList.remove('in-active')
+        this.resetCar(car.id as number, carSvg)
+      })
     })
   }
 
@@ -125,9 +142,8 @@ export default class Garage {
 
   async renderRandomCars() {
     let count = 100
-    console.log(getCarColor())
-    while( 0 < count) {
-      await this.api.createCar({ name: getCarName(), color: getCarColor()})
+    while (0 < count) {
+      await this.api.createCar({ name: getCarName(), color: getCarColor() })
       count--
     }
   }
@@ -139,14 +155,14 @@ export default class Garage {
       this.renderGarageCars()
     })
     const updateBtn = document.querySelector('.btn__update') as HTMLButtonElement
-    updateBtn.addEventListener('click', () => {
-      this.updateEl()
-      this.renderGarageCars()
+    updateBtn.addEventListener('click', async () => {
+      await this.updateEl()
+      await this.renderGarageCars()
     })
     const prevBtnPagination = document.querySelector('.pagination-btn__prev') as HTMLButtonElement
     prevBtnPagination.addEventListener('click', () => {
       if (this.pageNumber > 1) this.pageNumber--
-      window.location.hash = `page${this.pageNumber}` 
+      window.location.hash = `page${this.pageNumber}`
       this.renderGarageCars()
     })
     const nextBtnPagination = document.querySelector('.pagination-btn__next') as HTMLButtonElement
@@ -156,7 +172,7 @@ export default class Garage {
       this.renderGarageCars()
     })
     const genereteBtn = document.querySelector('.generate__btn') as HTMLButtonElement
-    genereteBtn.addEventListener('click', async() => {
+    genereteBtn.addEventListener('click', async () => {
       await this.renderRandomCars()
       await this.renderGarageCars()
     })
@@ -183,4 +199,40 @@ export default class Garage {
     await this.api.updateCar(this.carItem?.id as number, { name, color })
   }
 
-} 
+  async carStart(id: number, item: Element) {
+    const { velocity, distance } = await this.api.toggleEngine(id, 'started')
+    const time = Math.round(distance / velocity)
+    const flag = document.querySelector(`.flag${id}`) as HTMLElement
+    const distanceBetweenEl = getDistance(item as HTMLElement, flag)
+    this.animateCar(time, distanceBetweenEl, id, item as HTMLElement)
+    const { success } = await this.api.driveCar(id)
+    console.log(success)
+    if (!success) {
+      window.cancelAnimationFrame(this.animationFrames[id])
+    }
+    return { success, id, time }
+  }
+
+  animateCar(animationTime: number, distance: number, carId: number, carEl: HTMLElement) {
+    let animationStart: number
+    const step = (timestamp: number) => {
+      if (!animationStart) {
+        animationStart = timestamp
+      }
+      const time = timestamp - animationStart
+      const passed = Math.round(time * (distance / animationTime))
+      carEl.style.transform = `translateX(${Math.min(passed, distance)}px)`
+      if (passed < distance) {
+        this.animationFrames[carId] = requestAnimationFrame(step)
+      }
+    }
+    this.animationFrames[carId] = requestAnimationFrame(step)
+  }
+
+
+  async resetCar(carId: number,carEl: HTMLElement) {
+    await this.api.toggleEngine(carId, 'stopped') 
+    window.cancelAnimationFrame(this.animationFrames[carId])
+    carEl.style.transform = `translateX(0px)`
+  }
+}
