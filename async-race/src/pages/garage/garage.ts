@@ -1,5 +1,5 @@
 import CarApi from "../../carApi"
-import { CarType } from "../type/types"
+import { CarType, RaceResult, Winner } from "../type/types"
 import { createEl, getCarColor, getCarName, animate, getDistance } from '../helpers/functions'
 import interpolate from '../helpers/interpolate'
 
@@ -13,8 +13,10 @@ export default class Garage {
   header: HTMLElement
   paginationEl: HTMLElement
   controlContainer: HTMLElement
+  congratText: HTMLElement
   count: string | undefined
   items: CarType[] | undefined
+  winner: Winner | undefined
   MAX_CARS_PER_PAGE: number
   pageNumber: number = 1
   carItem: CarType | undefined
@@ -30,6 +32,7 @@ export default class Garage {
     this.carsGarageEl = createEl('section', 'cars-garage')
     this.paginationEl = createEl('div', 'pagination-btns')
     this.controlContainer = createEl('section', 'cars-control')
+    this.congratText = createEl('div', 'raceWinner')
     this.root.append(this.header, this.controlContainer, this.carsGarageEl, this.paginationEl)
     this.carItem = undefined;
     this.carElem = undefined
@@ -76,7 +79,7 @@ export default class Garage {
       <button class="control__btn btn__update">UPDATE</button>
     </div>
     <div class="cars-control__race">
-      <button class="race__btn cars-control__race">RACE</button>
+      <button class="race__btn cars-control__start">RACE</button>
       <button class="race__btn cars-control__reset">RESET</button>
       <button class="generate__btn">GENERATE CARS</button>
     </div>
@@ -87,6 +90,7 @@ export default class Garage {
     this.animationFrames = {}
     const { items, count } = await this.api.getCars(this.pageNumber)
     this.count = count
+    this.items = items
     const template = document.querySelector('#car') as HTMLTemplateElement
     const cars: string[] = items.map((item) => {
       return interpolate(template.innerHTML, { item })
@@ -124,12 +128,13 @@ export default class Garage {
         startCarBtn.classList.add('in-active')
         startCarBtn.disabled = true
         returnCarBtn.classList.toggle('in-active')
-        await this.carStart(car.id as number, carSvg)
+        await this.startCar(car.id as number, carSvg)
       })
       const returnCarBtn = item.querySelector('.btn-return') as HTMLButtonElement
       returnCarBtn.addEventListener('click', () => {
         returnCarBtn.classList.toggle('in-active')
         startCarBtn.classList.remove('in-active')
+        startCarBtn.disabled = false
         this.resetCar(car.id as number, carSvg)
       })
     })
@@ -176,6 +181,25 @@ export default class Garage {
       await this.renderRandomCars()
       await this.renderGarageCars()
     })
+    const raceBtn = document.querySelector('.cars-control__start') as HTMLButtonElement
+    raceBtn?.addEventListener('click', (e) => {
+      e.stopPropagation()
+      raceBtn.classList.add('in-active')
+      raceBtn.disabled = true
+      resetBtn.classList.remove('in-active')
+      resetBtn.disabled = false
+      this.startRace()
+    })
+    const resetBtn = document.querySelector('.cars-control__reset') as HTMLButtonElement
+    resetBtn?.addEventListener('click', async (e) => {
+      e.stopPropagation()
+      this.congratText.style.display = 'none'
+      resetBtn.classList.add('in-active')
+      resetBtn.disabled = true
+      raceBtn.classList.remove('in-active')
+      raceBtn.disabled = false
+      await this.resetRace()
+    })
   }
 
   async createEl() {
@@ -199,17 +223,17 @@ export default class Garage {
     await this.api.updateCar(this.carItem?.id as number, { name, color })
   }
 
-  async carStart(id: number, item: Element) {
+  async startCar(id: number, item: Element) {
     const { velocity, distance } = await this.api.toggleEngine(id, 'started')
-    const time = Math.round(distance / velocity)
+    let time = Math.round(distance / velocity)
     const flag = document.querySelector(`.flag${id}`) as HTMLElement
     const distanceBetweenEl = getDistance(item as HTMLElement, flag)
     this.animateCar(time, distanceBetweenEl, id, item as HTMLElement)
     const { success } = await this.api.driveCar(id)
-    console.log(success)
     if (!success) {
       window.cancelAnimationFrame(this.animationFrames[id])
     }
+    time = Number((time / 1000).toFixed(2))
     return { success, id, time }
   }
 
@@ -229,10 +253,57 @@ export default class Garage {
     this.animationFrames[carId] = requestAnimationFrame(step)
   }
 
-
-  async resetCar(carId: number,carEl: HTMLElement) {
-    await this.api.toggleEngine(carId, 'stopped') 
+  async resetCar(carId: number, carEl: HTMLElement) {
+    await this.api.toggleEngine(carId, 'stopped')
     window.cancelAnimationFrame(this.animationFrames[carId])
     carEl.style.transform = `translateX(0px)`
+  }
+
+  async startRace() {
+    let wins = 0
+      this.carsGarageEl.querySelectorAll('.car-svg').forEach(async (carEl, index) => {
+        if (!this.items) return
+        const car = this.items[index]
+        const { success, id, time } = await this.startCar(car.id as number, carEl)
+        if (success && !this.winner) {
+          wins = 1
+          this.winner = { id, wins, time }
+          this.showWinner(car.name, time)  
+          await this.saveWinner() 
+        }
+      })
+
+      // else if(success && this.winner && this.winner.id === id) {
+      //   this.winner.wins++
+      //   console.log( this.winner)
+      // }
+  }
+
+  async saveWinner() {
+    if (!this.winner) return
+    let {id, wins, time} = this.winner
+    try{
+      await this.api.createWinner({id, wins, time})
+    } catch {
+      wins++
+      const newWinner = await this.api.getWinner(id)
+      await this.api.updateWinner(newWinner.id, {id, wins, time})
+    }
+  }
+
+  async resetRace() {
+    const allPromises: Promise<void>[] = []
+    this.carsGarageEl.querySelectorAll('.car-svg').forEach((carEl, index) => {
+      if (!this.items) return
+      const car = this.items[index]
+      allPromises.push(this.resetCar(car.id as number, carEl as HTMLElement))
+    })
+    await Promise.all(allPromises)
+  }
+
+  showWinner(name: string, time: number) {
+    this.congratText.style.display = 'block'
+    this.congratText.innerHTML = `${name} won the race in ${time}s`
+    this.carsGarageEl.append(this.congratText)
   }
 }
