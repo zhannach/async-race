@@ -272,11 +272,6 @@ export default class Garage {
           await this.saveWinner() 
         }
       })
-
-      // else if(success && this.winner && this.winner.id === id) {
-      //   this.winner.wins++
-      //   console.log( this.winner)
-      // }
   }
 
   async saveWinner() {

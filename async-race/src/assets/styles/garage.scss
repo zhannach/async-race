@@ -13,12 +13,18 @@
   &:hover{
     background-color: rgb(23, 82, 220);
   }
+  &.in-active {
+    background-color:  rgb(155, 154, 153);
+  }
 }
 
 @mixin yellow-btn {
   @include btn(rgb(234, 217, 31));
   &:hover{
     background-color: rgb(236, 163, 39);
+  }
+  &.in-active {
+    background-color:  rgb(155, 154, 153);
   }
 }
 
@@ -37,6 +43,7 @@ body {
 
 .btn-garage {
   @include yellow-btn();
+  margin-right: 10px;
 }
 
 .btn-winners {
@@ -72,6 +79,9 @@ body {
     &:focus { 
       border: 3px ridge  rgb(43, 187, 239)
     }
+    &.empty {
+      background-color:  rgb(222, 118, 102);
+    }
 }
 
 .input-color {
@@ -93,6 +103,7 @@ body {
 }
 
 .cars-garage {
+  position: relative;
 }
 .cars-garage__title {
   font-size: 2.5rem;
@@ -110,6 +121,16 @@ body {
 }
 
 .cars-garage__page {
+}
+
+.raceWinner {
+  position: absolute;
+  font-size: 3rem;
+  color: rgb(196, 201, 115);
+  text-shadow: rgb(243, 134, 32) 2px 0 10px;
+  font-weight: 600;
+  top: 250px;
+  left: 550px;
 }
 
 .cars-garage__car {
@@ -162,12 +183,19 @@ body {
   border-radius: 5px;
   font-weight: 700;
   background-color: #000;
+  margin-right: 5px;
 }
+
 .btn-start {
   color: rgb(55, 235, 127);
   border: 2px solid rgb(55, 235, 127);
   &:hover {
     background-color: rgb(50, 115, 76);
+  }
+  &.in-active{
+    color: rgb(111, 109, 109);
+    border: 2px solid  rgb(111, 109, 109);
+    background-color: rgb(13, 13, 13)
   }
 
 }
@@ -177,15 +205,15 @@ body {
   &:hover {
     background-color: rgb(119, 41, 41);
   }
+  &.in-active{
+    color: rgb(111, 109, 109);
+    border: 2px solid  rgb(111, 109, 109);
+    background-color: rgb(13, 13, 13)
+  }
 
 }
 .car-svg {
-  background-image: url('./car.svg');
-  background-repeat: no-repeat;
-  background-size: cover;
   margin-top: 20px;
-  height: 50px;
-  width: 100px;
 }
 
 .flag-svg {
@@ -193,8 +221,8 @@ body {
   background-image: url('./race-flag.svg');
   background-repeat: no-repeat;
   background-size: contain;
-  flex: 0 1 25%;
-  width: 100px;
+  flex: 0 1 15%;
+  width: 50px;
 }
 .pagination-btns {
   margin: 50px 0;
