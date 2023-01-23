@@ -7,7 +7,7 @@
   margin: 50px 0;
 }
 .cars-winners__title {
-  font-size: 2rem;
+  font-size: 2.5rem;
   color: #fff;
   font-weight: 600;
   margin-bottom: 20px;
@@ -15,7 +15,7 @@
 .cars-winners__amount {
 }
 .cars-winners__subtitle {
-  font-size: 1.5rem;
+  font-size: 2rem;
   color: #fff;
   font-weight: 500;
   margin-bottom: 20px;
@@ -39,12 +39,13 @@
 }
 
 .car-winner__svg {
+  display: inline-block;
   background-image: url('./car.svg');
   background-repeat: no-repeat;
   background-size: contain;
-  background-position-y: center;
-  height: 30px;
-  width: 15%;
+  background-position: 55% center;
+  // height: 30px;
+  // width: 15%;
 }
 .car-winner__name {
   text-align: center;
