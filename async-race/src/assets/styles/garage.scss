@@ -130,7 +130,7 @@ body {
   text-shadow: rgb(243, 134, 32) 2px 0 10px;
   font-weight: 600;
   top: 250px;
-  left: 550px;
+  left: 450px;
 }
 
 .cars-garage__car {
@@ -235,6 +235,9 @@ body {
   font-size: 1rem;
   &:hover{
     background-color: rgb(85, 84, 84);
+  }
+  &.in-active {
+    background-color:  rgb(74, 73, 72);
   }
 }
 .pagination-btn__prev {
