@@ -71,6 +71,4 @@ export default class Winners {
       ${winnersCarElements.join('')} `
     this.carsWinnerEl.append(winnersTable)
   }
-
-
 }
