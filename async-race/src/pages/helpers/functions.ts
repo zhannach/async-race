@@ -1,3 +1,6 @@
+import Garage from "../garage/garage"
+import Winners from "../winners/winners"
+
 export function createEl(tag: string, style: string, content?: string): HTMLElement {
   const element = document.createElement(tag) as HTMLElement
   element.classList.add(style)
@@ -54,5 +57,32 @@ export function animate(animationTime: number, distance: number, car: HTMLElemen
   requestId = requestAnimationFrame(step)
   return requestId
 }
+
+
+export function switchPage(visibleEls: HTMLElement[], hideEls: HTMLElement[]) {
+  console.log(hideEls)
+  visibleEls.map((el) => el.style.display = 'block')
+  hideEls.map((el) => el.style.display = 'none')
+}
+
+export type Pages = {
+  winners: Winners
+  garage: Garage
+}
+
+export function createLocationHandler({ garage, winners }: Pages) {
+  return () => {
+    const path = window.location.pathname;
+    if (path === '/winners') {
+      switchPage([winners.winnersEl], [garage.garageEl])
+      winners.run()
+    } else {
+      switchPage([garage.garageEl], [winners.winnersEl])
+    }
+  }
+}
+
+  
+
 
 
