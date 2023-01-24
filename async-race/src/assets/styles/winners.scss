@@ -1,39 +1,43 @@
-
-.cars-garage__amount {
-}
+.cars-garage__amount {}
 
 
 .cars-winners {
   margin: 50px 0;
 }
+
 .cars-winners__title {
   font-size: 2.5rem;
   color: #fff;
   font-weight: 600;
   margin-bottom: 20px;
 }
-.cars-winners__amount {
-}
+
+.cars-winners__amount {}
+
 .cars-winners__subtitle {
   font-size: 2rem;
   color: #fff;
   font-weight: 500;
   margin-bottom: 20px;
 }
-.cars-winners__page {
-}
-.cars-winners__table {
+
+.cars-winners__page {}
+
+.cars-winners__table{
   width: 600px;
 }
+
 .winners-table__titles {
   font-size: 1.5rem;
   color: #fff;
 }
+
 .car-winner {
   font-size: 1.2rem;
   color: #fff;
   height: 60px;
 }
+
 .car-winner__number {
   width: 3%;
 }
@@ -47,12 +51,49 @@
   // height: 30px;
   // width: 15%;
 }
+
 .car-winner__name {
   text-align: center;
 }
+
 .car-winner__wins {
   text-align: center;
 }
+
 .car-winner__time {
   text-align: center;
+}
+
+.btn-wins {
+  height: 20px;
+  width: 20px;
+  background-color: #000;
+  background-image: url('./arrow-white.svg');
+  background-repeat: no-repeat;
+  background-size: cover;
+  height: 20px;
+  width: 20px;
+  opacity: 0;
+  &.visible {
+    opacity: 1;
+  }
+  &.down {
+    transform: rotate(180deg);
+  }
+}
+
+
+.btn-time {
+  height: 20px;
+  width: 20px;
+  background-color: #000;
+  background-image: url('./arrow-white.svg');
+  background-repeat: no-repeat;
+  background-size: contain;
+  height: 20px;
+  width: 20px;
+
+  &.down {
+    transform: rotate(180deg);
+  }
 }
