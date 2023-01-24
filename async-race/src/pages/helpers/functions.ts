@@ -43,7 +43,6 @@ export function animate(animationTime: number, distance: number, car: HTMLElemen
   let animationStart: number
   let requestId
   function step(timestamp: number) {
-    console.log(timestamp)
     if (!animationStart) {
       animationStart = timestamp
     }
@@ -60,7 +59,6 @@ export function animate(animationTime: number, distance: number, car: HTMLElemen
 
 
 export function switchPage(visibleEls: HTMLElement[], hideEls: HTMLElement[]) {
-  console.log(hideEls)
   visibleEls.map((el) => el.style.display = 'block')
   hideEls.map((el) => el.style.display = 'none')
 }

@@ -194,7 +194,6 @@ export default class Garage {
   async createEl() {
     const inputName = document.querySelector('.create__name') as HTMLInputElement
     const inputColor = document.querySelector('.create__color') as HTMLInputElement
-    console.log(inputName)
     let name = inputName.value as string
     name = `${name[0].toUpperCase()}${name.slice(1)}`
     const color = inputColor.value as string

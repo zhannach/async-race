@@ -57,7 +57,6 @@ export default class CarApi {
 
   async toggleEngine(id: number, status: string): Promise<Engine> {
     const response = await fetch(`${this.engine}?id=${id}&status=${status}`, { method: 'PATCH' as string });
-    console.log( response)
     return response.json()
   }
 
@@ -85,7 +84,6 @@ export default class CarApi {
     const winners = items.map(async(item: Winner) => {
       return { ...item, car: await this.getCar(item.id as number) }
     })
-    console.log(await Promise.all(winners))
     return {
       winners: await Promise.all(winners) as Winner[],
       count: response.headers.get('X-Total-Count') as string
