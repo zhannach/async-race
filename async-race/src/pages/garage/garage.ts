@@ -167,9 +167,18 @@ export default class Garage {
       await this.renderRandomCars()
       await this.renderGarageCars(1)
     })
+    const startBtns = document.querySelectorAll('.btn-start') as NodeList
     this.raceBtn = document.querySelector('.cars-control__start') as HTMLButtonElement
     this.raceBtn?.addEventListener('click', (e) => {
       e.stopPropagation()
+      startBtns.forEach((btn) => {
+        (btn as HTMLButtonElement).classList.add('in-active');
+        (btn as HTMLButtonElement).disabled = true
+      })
+      returnBtns.forEach((btn) => {
+        (btn as HTMLButtonElement).classList.remove('in-active');
+        (btn as HTMLButtonElement).disabled = false
+      })
       if (!this.raceBtn) return
       this.raceBtn.classList.add('in-active')
       this.raceBtn.disabled = true
@@ -177,9 +186,18 @@ export default class Garage {
       resetBtn.disabled = false
       this.startRace()
     })
+    const returnBtns = document.querySelectorAll('.btn-return') as NodeList
     const resetBtn = document.querySelector('.cars-control__reset') as HTMLButtonElement
     resetBtn?.addEventListener('click', async (e) => {
       e.stopPropagation()
+      returnBtns.forEach((btn) => {
+        (btn as HTMLButtonElement).classList.add('in-active');
+        (btn as HTMLButtonElement).disabled = true
+      })
+      startBtns.forEach((btn) => {
+        (btn as HTMLButtonElement).classList.remove('in-active');
+        (btn as HTMLButtonElement).disabled = false
+      })
       this.congratText.style.display = 'none'
       resetBtn.classList.add('in-active')
       resetBtn.disabled = true
@@ -194,6 +212,7 @@ export default class Garage {
   async createEl() {
     const inputName = document.querySelector('.create__name') as HTMLInputElement
     const inputColor = document.querySelector('.create__color') as HTMLInputElement
+    console.log(inputName)
     let name = inputName.value as string
     name = `${name[0].toUpperCase()}${name.slice(1)}`
     const color = inputColor.value as string
