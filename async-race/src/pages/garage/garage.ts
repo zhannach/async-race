@@ -52,8 +52,8 @@ export default class Garage {
 
   async render() {
     this.renderControlPanel()
-    await this.renderGarageCars()
     this.garageEl.append(this.controlContainer, this.carsGarageEl)
+    await this.renderGarageCars()
     this.pagination = new Pagination(
       this.garageEl, 
       this.pageNumber, 
@@ -106,18 +106,20 @@ export default class Garage {
     </h3>
     ${cars.join('')}`
 
-    this.updateName = document.querySelector('.update__name') as HTMLInputElement
-    this.updateColor = document.querySelector('.update__color') as HTMLInputElement
+    this.updateName = this.garageEl.querySelector('.update__name') as HTMLInputElement
+    this.updateColor = this.garageEl.querySelector('.update__color') as HTMLInputElement
+    console.log(this.updateName, this.updateColor)
     this.carsGarageEl.querySelectorAll('.cars-garage__car').forEach((item, index) => {
       const car = items[index]
       const carSvg = item.querySelector('.car-svg') as HTMLElement
       const btnSelect = item.querySelector('.btn-select') as HTMLButtonElement
-      btnSelect.addEventListener('click', async () => {
+      btnSelect.addEventListener('click', () => {
         this.carItem = car;
         this.carElem = item
+        console.log(this.updateName, this.updateColor)
         if (this.updateName && this.updateColor) {
-          this.updateName.value = car.name as string
-          this.updateColor.value = this.carItem.color
+          this.updateName.value = this.carItem.name 
+          this.updateColor.value = this.carItem.color 
         }
       })
       const btnDelete = item.querySelector('.btn-remove') as HTMLButtonElement
@@ -131,6 +133,7 @@ export default class Garage {
         startCarBtn.classList.add('in-active')
         startCarBtn.disabled = true
         returnCarBtn.classList.toggle('in-active')
+        returnCarBtn.disabled = false
         await this.startCar(car.id as number, carSvg)
       })
       const returnCarBtn = item.querySelector('.btn-return') as HTMLButtonElement
@@ -171,13 +174,13 @@ export default class Garage {
     this.raceBtn = document.querySelector('.cars-control__start') as HTMLButtonElement
     this.raceBtn?.addEventListener('click', (e) => {
       e.stopPropagation()
-      startBtns.forEach((btn) => {
-        (btn as HTMLButtonElement).classList.add('in-active');
-        (btn as HTMLButtonElement).disabled = true
+      startBtns.forEach((btnStart) => {
+        (btnStart as HTMLButtonElement).classList.add('in-active');
+        (btnStart as HTMLButtonElement).disabled = true
       })
-      returnBtns.forEach((btn) => {
-        (btn as HTMLButtonElement).classList.remove('in-active');
-        (btn as HTMLButtonElement).disabled = false
+      returnBtns.forEach((btnReturn) => {
+        (btnReturn as HTMLButtonElement).classList.remove('in-active');
+        (btnReturn as HTMLButtonElement).disabled = false
       })
       if (!this.raceBtn) return
       this.raceBtn.classList.add('in-active')
