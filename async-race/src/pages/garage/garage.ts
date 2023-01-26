@@ -93,6 +93,7 @@ export default class Garage {
     const { items, count } = await this.api.getCars(this.pageNumber)
     this.count = Number(count)
     this.items = items
+    this.pagination?.setCount(this.count)
     const template = document.querySelector('#car') as HTMLTemplateElement
     const cars: string[] = items.map((item) => {
       return interpolate(template.innerHTML, { item })
@@ -108,7 +109,6 @@ export default class Garage {
 
     this.updateName = this.garageEl.querySelector('.update__name') as HTMLInputElement
     this.updateColor = this.garageEl.querySelector('.update__color') as HTMLInputElement
-    console.log(this.updateName, this.updateColor)
     this.carsGarageEl.querySelectorAll('.cars-garage__car').forEach((item, index) => {
       const car = items[index]
       const carSvg = item.querySelector('.car-svg') as HTMLElement
@@ -146,7 +146,7 @@ export default class Garage {
     })
   }
 
-  async renderRandomCars() {
+  async createRandomCars() {
     let count = 100
     while (0 < count) {
       await this.api.createCar({ name: getCarName(), color: getCarColor() })
@@ -167,8 +167,8 @@ export default class Garage {
     })
     const genereteBtn = document.querySelector('.generate__btn') as HTMLButtonElement
     genereteBtn.addEventListener('click', async () => {
-      await this.renderRandomCars()
-      await this.renderGarageCars(1)
+      await this.createRandomCars()
+      await this.renderGarageCars(this.pageNumber)
     })
     const startBtns = document.querySelectorAll('.btn-start') as NodeList
     this.raceBtn = document.querySelector('.cars-control__start') as HTMLButtonElement

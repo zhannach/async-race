@@ -1,9 +1,9 @@
 import { createEl } from "./functions"
 
 export class Pagination {
-  paginationEl: HTMLElement
-  pageNumber: number
-  count: number
+  private paginationEl: HTMLElement
+  private pageNumber: number
+  private count: number
 
   constructor(parentEl: HTMLElement, pageNumber: number, count: number, callback: (pageNumber: number) => void) {
     this.paginationEl = createEl('div', 'pagination-btns')
@@ -14,8 +14,12 @@ export class Pagination {
     this.count = count
   }
 
+  setCount(count: number) {
+    this.count = count
+  }
+ 
   renderPagination() {
-    this.paginationEl.innerHTML = `<button class="pagination-btn pagination-btn__prev in-active">PREV</button>
+    this.paginationEl.innerHTML = `<button class="pagination-btn pagination-btn__prev">PREV</button>
       <button class="pagination-btn pagination-btn__next">NEXT</button>`
   }
 
@@ -28,8 +32,6 @@ export class Pagination {
     })
     const nextBtnPagination = this.paginationEl.querySelector('.pagination-btn__next') as HTMLButtonElement
     nextBtnPagination.addEventListener('click', async () => {
-      prevBtnPagination.classList.remove('in-active')
-      if (this.pageNumber === Math.ceil(Number(this.count) / 10)) nextBtnPagination.classList.add('in-active')
       if (this.pageNumber < Math.ceil(Number(this.count) / 10)) this.pageNumber++
       window.location.hash = `page${this.pageNumber}`
       callback(this.pageNumber)
