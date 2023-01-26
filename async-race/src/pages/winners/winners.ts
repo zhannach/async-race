@@ -51,6 +51,7 @@ export default class Winners {
     const { winners, count } = await this.api.getWinners(pageNumber, 10, sort, order)
     this.winners = winners
     this.count = Number(count)
+    this.pagination?.setCount(this.count)
     this.carsWinnerEl.innerHTML = `<h2 class="cars-winners__title">WINNERS
     <span class="cars-winners__amount">(${count})</span>
   </h2>
